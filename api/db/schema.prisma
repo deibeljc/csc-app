@@ -1,0 +1,132 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = "native"
+}
+
+enum Tier {
+  MINOR
+  MAJOR
+  ELITE
+}
+
+enum PlayerType {
+  FREE_AGENT
+  PERM_FREE_AGENT
+  PERM_FREE_AGENT_SIGNED
+  SIGNED
+  BANNED
+}
+
+// Define your own datamodels here and run `yarn redwood prisma migrate dev`
+// to create migrations for them and apply to your dev DB.
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  Player         Player?  @relation(fields: [playerId], references: [id])
+  playerId       String?
+  hashedPassword String
+  salt           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Franchise {
+  id        String   @id @default(cuid())
+  name      String
+  gm        Player?  @relation(fields: [gmId], references: [id], name: "gm")
+  gmId      String?
+  agm       Player?  @relation(fields: [agmId], references: [id], name: "agm")
+  agmId     String?
+  Teams     Team[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Team {
+  id                String        @id @default(cuid())
+  name              String        @unique
+  acronym           String
+  tier              Tier
+  Players           Player[]
+  MatchesWon        Match[]
+  HomeMatches       Match[]       @relation(name: "homeTeam")
+  AwayMatches       Match[]       @relation(name: "awayTeam")
+  Franchise         Franchise?    @relation(fields: [franchiseId], references: [id])
+  franchiseId       String?
+  PlayersTradedAway Transaction[] @relation(name: "fromTeamId")
+  PlayersReceived   Transaction[] @relation(name: "toTeamId")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model Player {
+  id             String        @id @default(cuid())
+  name           String        @unique
+  steamId        String // Is this even a thing we have/can get?
+  discordId      String
+  tier           Tier
+  Team           Team?         @relation(fields: [teamId], references: [id])
+  teamId         String?
+  type           PlayerType    @default(FREE_AGENT)
+  GMOfFranchise  Franchise?    @relation(name: "gm")
+  AGMOfFranchise Franchise?    @relation(name: "agm")
+  User           User?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  Transaction    Transaction[]
+}
+
+model Transaction {
+  id               String     @id @default(cuid())
+  Player           Player     @relation(fields: [playerId], references: [id])
+  playerId         String
+  From             Team?      @relation(fields: [fromTeamId], references: [id], name: "fromTeamId")
+  fromTeamId       String?
+  To               Team?      @relation(fields: [toTeamId], references: [id], name: "toTeamId")
+  toTeamId         String?
+  // We need the approval of both parties in order for a transaction to be valid and happen
+  fromTeamApproved Boolean    @default(false)
+  toTeamApproved   Boolean    @default(false)
+  pending          Boolean    @default(true)
+  playerTypeBefore PlayerType
+  playerTypeAfter  PlayerType
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model Season {
+  id        String   @id @default(cuid())
+  number    Int // The season number
+  Matches   Match[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Match {
+  id           String     @id @default(cuid())
+  HomeTeam     Team       @relation(fields: [homeTeamId], references: [id], name: "homeTeam")
+  homeTeamId   String
+  AwayTeam     Team       @relation(fields: [awayTeamId], references: [id], name: "awayTeam")
+  awayTeamId   String
+  Season       Season?    @relation(fields: [seasonId], references: [id])
+  seasonId     String?
+  Winner       Team?      @relation(fields: [teamId], references: [id])
+  teamId       String?
+  MatchStats   MatchStats @relation(fields: [matchStatsId], references: [id])
+  matchStatsId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+// TODO: Fill this out with relevant info in the future
+model MatchStats {
+  id        String   @id @default(cuid())
+  Match     Match?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

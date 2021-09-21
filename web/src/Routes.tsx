@@ -13,7 +13,6 @@ import DefaultLayout from 'src/layouts/DefaultLayout/DefaultLayout'
 const Routes = () => {
   return (
     <Router>
-      <Route path="/programmers" page={ProgrammersPage} name="programmers" />
       <Private unauthenticated="login">
         <Set wrap={DefaultLayout}>
           <Route path="/players" page={PlayersPage} name="players" />

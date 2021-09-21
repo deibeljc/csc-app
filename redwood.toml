@@ -8,12 +8,12 @@
 [web]
   title = "CSC"
   port = 8910
-  apiProxyPath = "/.redwood/functions"
+  apiProxyPath = "/.netlify/functions"
   includeEnvironmentVariables = [] # any ENV vars that should be available to the web side, see https://redwoodjs.com/docs/environment-variables#web
 [api]
   port = 8911
 [browser]
   open = true
 [experimental]
-  esbuild = false
-  useEnvelop = false
+  esbuild = true
+  useEnvelop = true

@@ -2,7 +2,7 @@ import {
   ResolverArgs,
   BeforeResolverSpecType,
   UserInputError,
-} from '@redwoodjs/api'
+} from '@redwoodjs/graphql-server'
 import { PlayerType } from '@prisma/client'
 
 import { db } from 'src/lib/db'

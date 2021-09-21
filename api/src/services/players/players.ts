@@ -2,7 +2,7 @@ import {
   ResolverArgs,
   BeforeResolverSpecType,
   UserInputError,
-} from '@redwoodjs/api'
+} from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { requireAuth } from 'src/lib/auth'

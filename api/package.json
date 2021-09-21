@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "@envelop/live-query": "^1.0.1",
     "@redwoodjs/api": "0.36.4",
+    "@redwoodjs/graphql-server": "^0.36.4",
     "pino-datadog": "^2.0.2"
   }
 }

@@ -1,6 +1,9 @@
 import type { User } from '@prisma/client'
-import type { ResolverArgs, BeforeResolverSpecType } from '@redwoodjs/api'
-import { context } from '@redwoodjs/api'
+import type {
+  ResolverArgs,
+  BeforeResolverSpecType,
+} from '@redwoodjs/graphql-server'
+import { context } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { requireAuth } from 'src/lib/auth'

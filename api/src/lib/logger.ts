@@ -1,5 +1,5 @@
 import datadog from 'pino-datadog'
-import { createLogger } from '@redwoodjs/api/logger'
+import { createLogger } from '@redwoodjs/graphql-server/logger'
 
 export const stream = datadog.createWriteStreamSync({
   apiKey: process.env.DATADOG_API_KEY,

@@ -7,6 +7,7 @@ import { PlayerType } from '@prisma/client'
 
 import { db } from 'src/lib/db'
 import { requireAuth } from 'src/lib/auth'
+import { liveQueryStore } from 'src/functions/graphql'
 
 // Used when the environment variable REDWOOD_SECURE_SERVICES=1
 export const beforeResolver = (rules: BeforeResolverSpecType) => {
@@ -70,6 +71,8 @@ export const addPlayerToTeam = async ({ input }) => {
       type: playerTypeAfter,
     },
   })
+
+  liveQueryStore.invalidate('Query.transactions')
 
   return db.team.update({
     where: {
@@ -140,6 +143,8 @@ export const dropPlayerFromTeam = async ({ input }) => {
       type: playerTypeAfter,
     },
   })
+
+  liveQueryStore.invalidate('Query.transactions')
 
   return db.team.update({
     where: {

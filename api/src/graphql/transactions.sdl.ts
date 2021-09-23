@@ -30,7 +30,7 @@ export const schema = gql`
   }
 
   type Query {
-    transactions(myPending: Boolean): [Transaction!]!
+    transactions(myPending: Boolean): [Transaction!]! @requireAuth
   }
 
   input CreateTransactionInput {

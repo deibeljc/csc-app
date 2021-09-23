@@ -1,12 +1,12 @@
 import datadog from 'pino-datadog'
-import { createLogger } from '@redwoodjs/graphql-server/logger'
+import { createLogger } from '@redwoodjs/api/logger'
 
-export const stream = datadog.createWriteStreamSync({
-  apiKey: process.env.DATADOG_API_KEY,
-  ddsource: 'csc',
-  service: 'csc-api',
-  size: 1,
-})
+// export const stream = datadog.createWriteStreamSync({
+//   apiKey: process.env.DATADOG_API_KEY,
+//   ddsource: 'csc',
+//   service: 'csc-api',
+//   size: 1,
+// })
 
 /**
  * Creates a logger with RedwoodLoggerOptions
@@ -24,8 +24,7 @@ export const stream = datadog.createWriteStreamSync({
  */
 export const logger = createLogger({
   options: {
-    prettyPrint: false,
-    level: 'info',
+    prettyPrint: true,
+    level: 'trace',
   },
-  destination: stream,
 })

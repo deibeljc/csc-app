@@ -6,7 +6,7 @@ export const schema = gql`
   }
 
   type Query {
-    seasons: [Season!]!
+    seasons: [Season!]! @requireAuth
   }
 
   input CreateSeasonInput {

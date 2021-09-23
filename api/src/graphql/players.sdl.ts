@@ -21,7 +21,7 @@ export const schema = gql`
   }
 
   type Query {
-    players: [Player!]!
+    players: [Player!]! @requireAuth
   }
 
   input CreatePlayerInput {
@@ -45,6 +45,6 @@ export const schema = gql`
   }
 
   type Mutation {
-    createPlayer(input: CreatePlayerInput!): Player
+    createPlayer(input: CreatePlayerInput!): Player @requireAuth
   }
 `

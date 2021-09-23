@@ -2,7 +2,7 @@ import type { TeamsQuery } from 'types/graphql'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
 export const QUERY = gql`
-  query TeamsQuery {
+  query TeamsQuery @live {
     teams {
       id
       PlayersReceived {
@@ -17,7 +17,7 @@ export const QUERY = gql`
         createdAt
       }
     }
-    transactions(myPending: true) {
+    transactions {
       id
       From {
         name
@@ -43,7 +43,7 @@ export const Success = ({ transactions }: CellSuccessProps<TeamsQuery>) => {
       {transactions.map((item) => {
         return (
           <li key={item.id}>
-            <pre>{JSON.stringify(item, null, 2)}</pre>
+            <pre className="text-xs">{JSON.stringify(item, null, 2)}</pre>
           </li>
         )
       })}

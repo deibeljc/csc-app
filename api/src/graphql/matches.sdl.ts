@@ -12,7 +12,7 @@ export const schema = gql`
   }
 
   type Query {
-    matches: [Match!]!
+    matches: [Match!]! @requireAuth
   }
 
   input CreateMatchInput {

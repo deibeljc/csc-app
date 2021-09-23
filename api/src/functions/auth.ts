@@ -31,8 +31,16 @@ export const handler = async (event, context) => {
     // didn't validate their email yet), throw an error and it will be returned
     // by the `logIn()` function from `useAuth()` in the form of:
     // `{ error: 'Error message' }`
-    loginHandler: async (user) => {
-      return user
+    login: {
+      handler: async (user) => {
+        return user
+      },
+      errors: {
+        incorrectPassword: 'User credentials are incorrect',
+        usernameNotFound: 'User credentials are incorrect',
+        usernameOrPasswordMissing: 'User credentials are incorrect',
+      },
+      expires: 60 * 60 * 24 * 365,
     },
 
     // Whatever you want to happen to your data on new user signup. Redwood will
@@ -50,19 +58,22 @@ export const handler = async (event, context) => {
     //
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
-    signupHandler: ({ username, hashedPassword, salt, userAttributes }) => {
-      return db.user.create({
-        data: {
-          email: username,
-          hashedPassword: hashedPassword,
-          salt: salt,
-          // name: userAttributes.name
-        },
-      })
+    signup: {
+      errors: {
+        fieldMissing: '${field} cannot be blank',
+        usernameTaken: 'Username ${username} already in use',
+      },
+      handler: ({ username, hashedPassword, salt, userAttributes }) => {
+        return db.user.create({
+          data: {
+            email: username,
+            hashedPassword: hashedPassword,
+            salt: salt,
+            // name: userAttributes.name
+          },
+        })
+      },
     },
-
-    // How long a user will remain logged in, in seconds
-    loginExpires: 60 * 60 * 24 * 365 * 10,
   })
 
   return await authHandler.invoke()

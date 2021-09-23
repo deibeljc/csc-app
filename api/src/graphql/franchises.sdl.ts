@@ -10,7 +10,7 @@ export const schema = gql`
   }
 
   type Query {
-    franchises: [Franchise!]!
+    franchises: [Franchise!]! @requireAuth
   }
 
   input CreateFranchiseInput {
@@ -27,6 +27,6 @@ export const schema = gql`
   }
 
   type Mutation {
-    createFranchise(input: CreateFranchiseInput!): Franchise
+    createFranchise(input: CreateFranchiseInput!): Franchise @requireAuth
   }
 `

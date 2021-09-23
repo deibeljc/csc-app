@@ -1,18 +1,9 @@
 import type { User } from '@prisma/client'
-import type {
-  ResolverArgs,
-  BeforeResolverSpecType,
-} from '@redwoodjs/graphql-server'
+import type { ResolverArgs } from '@redwoodjs/graphql-server'
 import { context } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
-import { requireAuth } from 'src/lib/auth'
 import { logger } from 'src/lib/logger'
-
-// Used when the environment variable REDWOOD_SECURE_SERVICES=1
-export const beforeResolver = (rules: BeforeResolverSpecType) => {
-  rules.add(requireAuth)
-}
 
 export const transactions = ({ myPending }) => {
   const user = context.currentUser as User

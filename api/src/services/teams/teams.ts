@@ -1,24 +1,44 @@
 import {
+  ForbiddenError,
   ResolverArgs,
-  BeforeResolverSpecType,
   UserInputError,
 } from '@redwoodjs/graphql-server'
 import { PlayerType } from '@prisma/client'
 
 import { db } from 'src/lib/db'
-import { requireAuth } from 'src/lib/auth'
-import { liveQueryStore } from 'src/functions/graphql'
+import { logger } from 'src/lib/logger'
 
-// Used when the environment variable REDWOOD_SECURE_SERVICES=1
-export const beforeResolver = (rules: BeforeResolverSpecType) => {
-  rules.add(requireAuth)
+async function validateIsGMOfAny(franchises: string[]) {
+  let isGMOf = undefined
+  for (const franchiseId of franchises) {
+    try {
+      const franchise = await db.franchise.findUnique({
+        where: { id: franchiseId },
+      })
+
+      if (franchise.gmId === context.currentUser.playerId) {
+        isGMOf = franchise.id
+      }
+    } catch {
+      logger.error(`${franchiseId} is not a valid franchise`)
+    }
+  }
+
+  if (!isGMOf) {
+    throw new ForbiddenError('You are not a GM of either team')
+  }
+
+  return isGMOf
 }
 
 export const teams = () => {
   return db.team.findMany()
 }
 
-// TODO: On all these endpoints, restrict by GM/AGM of the respective team or Admins only.
+export const team = ({ name }) => {
+  return db.team.findUnique({ where: { name } })
+}
+
 export const addPlayerToTeam = async ({ input }) => {
   const player = await db.player.findUnique({
     where: {
@@ -71,8 +91,6 @@ export const addPlayerToTeam = async ({ input }) => {
       type: playerTypeAfter,
     },
   })
-
-  liveQueryStore.invalidate('Query.transactions')
 
   return db.team.update({
     where: {
@@ -144,8 +162,6 @@ export const dropPlayerFromTeam = async ({ input }) => {
     },
   })
 
-  liveQueryStore.invalidate('Query.transactions')
-
   return db.team.update({
     where: {
       id: input.teamId,
@@ -154,6 +170,51 @@ export const dropPlayerFromTeam = async ({ input }) => {
       Players: {
         disconnect: {
           id: input.playerId,
+        },
+      },
+    },
+  })
+}
+
+export const tradePlayerFromTeam = async ({ input }) => {
+  // Make sure the user is a GM of either team
+  const gmOf = await validateIsGMOfAny([input.fromTeamId, input.toTeamId])
+  const player = await db.player.findUnique({
+    where: {
+      id: input.playerId,
+    },
+  })
+  const fromTeam = await db.team.findUnique({
+    where: { id: input.fromTeamId },
+  })
+  const toTeam = await db.team.findUnique({
+    where: { id: input.toTeamId },
+  })
+
+  const fromTeamApproved = gmOf === fromTeam.franchiseId
+  const toTeamApproved = gmOf === toTeam.franchiseId
+
+  // Create our transaction
+  return db.transaction.create({
+    data: {
+      Player: {
+        connect: {
+          id: input.playerId,
+        },
+      },
+      fromTeamApproved: fromTeamApproved,
+      toTeamApproved: toTeamApproved,
+      pending: true,
+      playerTypeBefore: player.type,
+      playerTypeAfter: PlayerType.SIGNED,
+      From: {
+        connect: {
+          id: input.fromTeamId,
+        },
+      },
+      To: {
+        connect: {
+          id: input.toTeamId,
         },
       },
     },

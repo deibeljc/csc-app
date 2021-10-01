@@ -18,6 +18,7 @@ export const schema = gql`
     MINOR
     MAJOR
     ELITE
+    UNASSIGNED
   }
 
   type Query {
@@ -26,12 +27,6 @@ export const schema = gql`
 
   input CreatePlayerInput {
     name: String!
-    steamId: String!
-    userId: String
-    discordId: String!
-    tier: Tier!
-    teamId: String
-    freeAgent: Boolean!
   }
 
   input UpdatePlayerInput {

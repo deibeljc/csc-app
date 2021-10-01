@@ -22,6 +22,7 @@ export const schema = gql`
 
   type Query {
     teams: [Team!]! @requireAuth
+    team(name: String!): Team @requireAuth
   }
 
   input CreateTeamInput {
@@ -55,9 +56,9 @@ export const schema = gql`
   }
 
   type Mutation {
-    addPlayerToTeam(input: AddPlayerInput!): Team @requireAuth
-    dropPlayerFromTeam(input: DropPlayerInput!): Team @requireAuth
-    tradePlayerFromTeam(input: TradePlayerInput!): Team @requireAuth
-    createTeam(input: CreateTeamInput!): Team @requireAuth
+    addPlayerToTeam(input: AddPlayerInput!): Team @requireAuth @isGM
+    dropPlayerFromTeam(input: DropPlayerInput!): Team @requireAuth @isGM
+    tradePlayerFromTeam(input: TradePlayerInput!): Transaction @requireAuth
+    createTeam(input: CreateTeamInput!): Team @requireAuth(roles: ["admin"])
   }
 `

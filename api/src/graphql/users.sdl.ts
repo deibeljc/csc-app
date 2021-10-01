@@ -2,15 +2,15 @@ export const schema = gql`
   type User {
     id: String!
     email: String!
-    name: String
     Player: Player
     playerId: String
     hashedPassword: String!
+    UserRoles: [UserRole]
     salt: String!
   }
 
   type Query {
-    users: [User!]! @requireAuth
+    users: [User!]! @requireAuth(roles: ["admin"])
   }
 
   input CreateUserInput {

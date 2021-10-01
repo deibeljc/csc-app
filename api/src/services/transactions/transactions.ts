@@ -5,37 +5,22 @@ import { context } from '@redwoodjs/graphql-server'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
-export const transactions = ({ myPending }) => {
+export const transactions = ({ teamId }) => {
   const user = context.currentUser as User
-  if (myPending && user) {
+  if (teamId && user) {
     logger.info({ user: user.id }, 'Finding pending transactions for a user')
     return db.transaction.findMany({
       where: {
-        AND: [
+        OR: [
           {
-            pending: true,
+            From: {
+              id: teamId,
+            },
           },
           {
-            OR: [
-              {
-                From: {
-                  Franchise: {
-                    agmId: {
-                      equals: user.playerId,
-                    },
-                  },
-                },
-              },
-              {
-                To: {
-                  Franchise: {
-                    agmId: {
-                      equals: user.playerId,
-                    },
-                  },
-                },
-              },
-            ],
+            To: {
+              id: teamId,
+            },
           },
         ],
       },

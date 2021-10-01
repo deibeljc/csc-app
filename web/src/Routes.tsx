@@ -13,17 +13,16 @@ import DefaultLayout from 'src/layouts/DefaultLayout/DefaultLayout'
 const Routes = () => {
   return (
     <Router>
-      <Private unauthenticated="login">
+      <Private unauthenticated="home">
         <Set wrap={DefaultLayout}>
-          <Route path="/players" page={PlayersPage} name="players" />
           <Route path="/teams" page={TeamsPage} name="teams" />
+          <Route path="/team/{name}" page={TeamPage} name="team" />
+          <Route path="/players" page={PlayersPage} name="players" />
         </Set>
       </Private>
       <Set wrap={DefaultLayout} prerender>
         <Route path="/" page={HomePage} name="home" />
       </Set>
-      <Route path="/login" prerender page={LoginPage} name="login" />
-      <Route path="/signup" prerender page={SignupPage} name="signup" />
       <Route notfound prerender page={NotFoundPage} />
     </Router>
   )

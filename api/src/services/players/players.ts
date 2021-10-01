@@ -1,16 +1,6 @@
-import {
-  ResolverArgs,
-  BeforeResolverSpecType,
-  UserInputError,
-} from '@redwoodjs/graphql-server'
+import { ResolverArgs, UserInputError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
-import { requireAuth } from 'src/lib/auth'
-
-// Used when the environment variable REDWOOD_SECURE_SERVICES=1
-export const beforeResolver = (rules: BeforeResolverSpecType) => {
-  rules.add(requireAuth)
-}
 
 export const players = async () => {
   console.time('findPlayers')
@@ -20,7 +10,9 @@ export const players = async () => {
 }
 
 export const createPlayer = async ({ input }) => {
-  const user = await db.user.findUnique({ where: { id: input.userId } })
+  const user = await db.user.findUnique({
+    where: { id: context.currentUser?.id },
+  })
 
   if (!user) {
     throw new UserInputError('User Id does not exist', {
@@ -40,13 +32,10 @@ export const createPlayer = async ({ input }) => {
   // We by default create out player as a free agent
   return db.player.create({
     data: {
-      discordId: input.discordId,
       name: input.name,
-      steamId: input.steamId,
-      tier: input.tier,
       User: {
         connect: {
-          id: input.userId,
+          id: context.currentUser.id,
         },
       },
     },

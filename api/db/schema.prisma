@@ -12,6 +12,7 @@ enum Tier {
   MINOR
   MAJOR
   ELITE
+  UNASSIGNED
 }
 
 enum PlayerType {
@@ -25,14 +26,25 @@ enum PlayerType {
 // Define your own datamodels here and run `yarn redwood prisma migrate dev`
 // to create migrations for them and apply to your dev DB.
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  Player         Player?  @relation(fields: [playerId], references: [id])
-  playerId       String?
-  hashedPassword String
-  salt           String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  // The discord ID of the user
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String?
+  discriminator String?
+  Player        Player?    @relation(fields: [playerId], references: [id])
+  playerId      String?
+  UserRoles     UserRole[]
+}
+
+model UserRole {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  name      String
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@unique([name, userId])
 }
 
 model Franchise {
@@ -51,9 +63,10 @@ model Team {
   id                String        @id @default(cuid())
   name              String        @unique
   acronym           String
-  tier              Tier
+  tier              Tier          @default(UNASSIGNED)
   Players           Player[]
-  MatchesWon        Match[]
+  MatchesWon        Match[]       @relation(name: "winner")
+  MatchesLost       Match[]       @relation(name: "loser")
   HomeMatches       Match[]       @relation(name: "homeTeam")
   AwayMatches       Match[]       @relation(name: "awayTeam")
   Franchise         Franchise?    @relation(fields: [franchiseId], references: [id])
@@ -67,9 +80,8 @@ model Team {
 model Player {
   id             String        @id @default(cuid())
   name           String        @unique
-  steamId        String // Is this even a thing we have/can get?
-  discordId      String
-  tier           Tier
+  steamId        String? // Is this even a thing we have/can get?
+  tier           Tier          @default(UNASSIGNED)
   Team           Team?         @relation(fields: [teamId], references: [id])
   teamId         String?
   type           PlayerType    @default(FREE_AGENT)
@@ -115,8 +127,10 @@ model Match {
   awayTeamId   String
   Season       Season?    @relation(fields: [seasonId], references: [id])
   seasonId     String?
-  Winner       Team?      @relation(fields: [teamId], references: [id])
-  teamId       String?
+  Winner       Team?      @relation(fields: [winnerTeamId], references: [id], name: "winner")
+  winnerTeamId String?
+  Loser        Team?      @relation(fields: [loserTeamId], references: [id], name: "loser")
+  loserTeamId  String?
   MatchStats   MatchStats @relation(fields: [matchStatsId], references: [id])
   matchStatsId String
   createdAt    DateTime   @default(now())

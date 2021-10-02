@@ -176,6 +176,15 @@ export const dropPlayerFromTeam = async ({ input }) => {
   })
 }
 
+export const createTeam = ({ input }) => {
+  return db.team.create({
+    data: {
+      acronym: input.acronym,
+      name: input.name,
+    },
+  })
+}
+
 export const tradePlayerFromTeam = async ({ input }) => {
   // Make sure the user is a GM of either team
   const gmOf = await validateIsGMOfAny([input.fromTeamId, input.toTeamId])

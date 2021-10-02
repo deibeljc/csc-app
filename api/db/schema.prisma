@@ -79,6 +79,8 @@ model Team {
 
 model Player {
   id             String        @id @default(cuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   name           String        @unique
   steamId        String? // Is this even a thing we have/can get?
   tier           Tier          @default(UNASSIGNED)
@@ -88,9 +90,21 @@ model Player {
   GMOfFranchise  Franchise?    @relation(name: "gm")
   AGMOfFranchise Franchise?    @relation(name: "agm")
   User           User?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  Transaction    Transaction[]
+  Transactions   Transaction[]
+  PlayerStats    PlayerStats[]
+}
+
+model PlayerStats {
+  id               String      @id @default(cuid())
+  kills            Int
+  deaths           Int
+  assists          Int
+  effectiveFlashes Int
+  ADR              Float
+  Player           Player      @relation(fields: [playerId], references: [id])
+  playerId         String
+  MatchStats       MatchStats? @relation(fields: [matchStatsId], references: [id])
+  matchStatsId     String?
 }
 
 model Transaction {
@@ -120,27 +134,30 @@ model Season {
 }
 
 model Match {
-  id           String     @id @default(cuid())
-  HomeTeam     Team       @relation(fields: [homeTeamId], references: [id], name: "homeTeam")
+  id           String      @id @default(cuid())
+  // What match number we are, this makes it easy to sort
+  number       Int
+  HomeTeam     Team        @relation(fields: [homeTeamId], references: [id], name: "homeTeam")
   homeTeamId   String
-  AwayTeam     Team       @relation(fields: [awayTeamId], references: [id], name: "awayTeam")
+  AwayTeam     Team        @relation(fields: [awayTeamId], references: [id], name: "awayTeam")
   awayTeamId   String
-  Season       Season?    @relation(fields: [seasonId], references: [id])
+  Season       Season?     @relation(fields: [seasonId], references: [id])
   seasonId     String?
-  Winner       Team?      @relation(fields: [winnerTeamId], references: [id], name: "winner")
+  Winner       Team?       @relation(fields: [winnerTeamId], references: [id], name: "winner")
   winnerTeamId String?
-  Loser        Team?      @relation(fields: [loserTeamId], references: [id], name: "loser")
+  Loser        Team?       @relation(fields: [loserTeamId], references: [id], name: "loser")
   loserTeamId  String?
-  MatchStats   MatchStats @relation(fields: [matchStatsId], references: [id])
-  matchStatsId String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  MatchStats   MatchStats? @relation(fields: [matchStatsId], references: [id])
+  matchStatsId String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 // TODO: Fill this out with relevant info in the future
 model MatchStats {
-  id        String   @id @default(cuid())
-  Match     Match?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String        @id @default(cuid())
+  Match       Match?
+  PlayerStats PlayerStats[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }

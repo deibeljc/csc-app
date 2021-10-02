@@ -31,7 +31,7 @@ export const schema = gql`
 
   type Query {
     transactions(myPending: Boolean): [Transaction!]! @requireAuth
-    transactions(teamId: String): [Transaction!]! @requireAuth
+    transactions(teamName: String): [Transaction!]! @requireAuth
   }
 
   input CreateTransactionInput {

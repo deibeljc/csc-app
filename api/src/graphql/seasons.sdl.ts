@@ -16,4 +16,8 @@ export const schema = gql`
   input UpdateSeasonInput {
     number: Int
   }
+
+  type Mutation {
+    createSeason(number: Int!): Season!
+  }
 `

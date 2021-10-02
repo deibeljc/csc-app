@@ -2,7 +2,6 @@ import type { FindTeamQuery } from 'types/graphql'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
 import { ChartSquareBarIcon, ViewListIcon } from '@heroicons/react/solid'
-import TeamTransactionTimelineCell from 'src/components/Cells/TeamTransactionTimelineCell/TeamTransactionTimelineCell'
 
 export const QUERY = gql`
   query FindTeamQuery($name: String!) {
@@ -29,7 +28,6 @@ export const Success = ({ team }: CellSuccessProps<FindTeamQuery>) => {
   return (
     <div>
       <div className="pb-4">
-        <h3 className="text-xl pb-4">Players</h3>
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {team.Players.map((p) => (
             <li
@@ -81,10 +79,6 @@ export const Success = ({ team }: CellSuccessProps<FindTeamQuery>) => {
             </li>
           ))}
         </ul>
-      </div>
-      <div>
-        <h3 className="text-xl pb-4">Team Transactions</h3>
-        <TeamTransactionTimelineCell id={team.id} />
       </div>
     </div>
   )

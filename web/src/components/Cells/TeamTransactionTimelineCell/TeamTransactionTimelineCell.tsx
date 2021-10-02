@@ -7,8 +7,8 @@ import { PlusIcon, MinusIcon } from '@heroicons/react/solid'
 import { AnimatePresence, motion } from 'framer-motion'
 
 export const QUERY = gql`
-  query FindTeamTransactionTimelineQuery($id: String!) {
-    transactions(teamId: $id) {
+  query FindTeamTransactionTimelineQuery($name: String!) {
+    transactions(teamName: $name) {
       id
       Player {
         name

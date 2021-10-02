@@ -21,6 +21,7 @@ enum PlayerType {
   PERM_FREE_AGENT_SIGNED
   SIGNED
   BANNED
+  INACTIVE
 }
 
 // Define your own datamodels here and run `yarn redwood prisma migrate dev`

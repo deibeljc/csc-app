@@ -20,13 +20,7 @@ export const schema = gql`
     PERM_FREE_AGENT_SIGNED
     SIGNED
     BANNED
-  }
-  enum PlayerType {
-    FREE_AGENT
-    PERM_FREE_AGENT
-    PERM_FREE_AGENT_SIGNED
-    SIGNED
-    BANNED
+    INACTIVE
   }
 
   type Query {

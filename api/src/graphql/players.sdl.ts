@@ -14,6 +14,15 @@ export const schema = gql`
     User: User
   }
 
+  enum PlayerType {
+    FREE_AGENT
+    PERM_FREE_AGENT
+    PERM_FREE_AGENT_SIGNED
+    SIGNED
+    BANNED
+    INACTIVE
+  }
+
   enum Tier {
     MINOR
     MAJOR
@@ -41,5 +50,10 @@ export const schema = gql`
 
   type Mutation {
     createPlayer(input: CreatePlayerInput!): Player @requireAuth
+    setPlayerActivity(
+      playerId: String!
+      active: Boolean!
+      isPermFreeAgent: Boolean = False
+    ): Player @requireAuth(roles: ["admin"])
   }
 `

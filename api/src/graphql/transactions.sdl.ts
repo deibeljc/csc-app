@@ -14,15 +14,6 @@ export const schema = gql`
     createdAt: DateTime!
   }
 
-  enum PlayerType {
-    FREE_AGENT
-    PERM_FREE_AGENT
-    PERM_FREE_AGENT_SIGNED
-    SIGNED
-    BANNED
-    INACTIVE
-  }
-
   type Query {
     transactions(myPending: Boolean): [Transaction!]! @requireAuth
     transactions(teamName: String): [Transaction!]! @requireAuth

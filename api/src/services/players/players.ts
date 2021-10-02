@@ -42,6 +42,22 @@ export const createPlayer = async ({ input }) => {
   })
 }
 
+export const setPlayerActivity = ({ playerId, active, isPermFreeAgent }) => {
+  const type = active
+    ? isPermFreeAgent
+      ? 'PERM_FREE_AGENT'
+      : 'FREE_AGENT'
+    : 'INACTIVE'
+  return db.player.update({
+    where: {
+      id: playerId,
+    },
+    data: {
+      type,
+    },
+  })
+}
+
 export const Player = {
   Team: (_obj, { root }: ResolverArgs<ReturnType<typeof Player>>) =>
     db.player.findUnique({ where: { id: root.id } }).Team(),

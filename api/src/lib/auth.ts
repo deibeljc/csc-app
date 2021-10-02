@@ -1,5 +1,7 @@
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
+import jwt from 'jsonwebtoken'
 import { db } from './db'
+import { logger } from './logger'
 
 /**
  * getCurrentUser returns the user information together with
@@ -13,14 +15,36 @@ import { db } from './db'
  *
  * @see https://github.com/redwoodjs/redwood/tree/main/packages/auth for examples
  */
-export const getCurrentUser = async (decoded) => {
-  const dbUser = await db.user.findUnique({
-    where: { id: decoded.sub },
-    include: {
-      UserRoles: true,
-    },
-  })
-  return { ...decoded, ...dbUser, roles: dbUser?.UserRoles ?? [] }
+export const getCurrentUser = async (decoded, { token, type }) => {
+  switch (type) {
+    case 'supabase': {
+      const dbUser = await db.user.findUnique({
+        where: { id: decoded.sub },
+        include: {
+          UserRoles: true,
+        },
+      })
+      return { ...decoded, ...dbUser, roles: dbUser?.UserRoles ?? [] }
+    }
+    case 'custom': {
+      try {
+        const customDecoded: any = jwt.verify(
+          token,
+          process.env.CUSTOM_AUTH_SECRET
+        )
+        logger.info(customDecoded.id)
+        const dbUser = await db.user.findUnique({
+          where: { id: customDecoded.id },
+          include: {
+            UserRoles: true,
+          },
+        })
+        return { ...dbUser, roles: dbUser?.UserRoles }
+      } catch (e) {
+        logger.error(e)
+      }
+    }
+  }
 }
 
 /**
@@ -75,7 +99,7 @@ export const hasRole = ({ roles }) => {
  *
  * @see https://github.com/redwoodjs/redwood/tree/main/packages/auth for examples
  */
-export const requireAuth = ({ roles } = {}) => {
+export const requireAuth = ({ roles }: { roles?: string[] } = {}) => {
   if (!isAuthenticated()) {
     throw new AuthenticationError("You don't have permission to do that.")
   }

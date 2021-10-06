@@ -48,18 +48,19 @@ export const Success = ({
       <ul className="-mb-8">
         <AnimatePresence initial={false}>
           {transactions.map((transaction, eventIdx) => {
-            const bgColor =
+            const condition =
+              transaction.playerTypeAfter === PlayerType.FREE_AGENT ||
+              transaction.playerTypeAfter === PlayerType.INACTIVE
+            const bgColor = condition ? `bg-red-400` : `bg-green-400`
+            const Icon = condition ? MinusIcon : PlusIcon
+            let text =
               transaction.playerTypeAfter === PlayerType.FREE_AGENT
-                ? `bg-red-400`
-                : `bg-green-400`
-            const Icon =
-              transaction.playerTypeAfter === PlayerType.FREE_AGENT
-                ? MinusIcon
-                : PlusIcon
-            const text =
-              transaction.playerTypeAfter === PlayerType.FREE_AGENT
-                ? `${transaction.Player.name} was dropped from ${transaction.From.name}`
-                : `${transaction.Player.name} was signed to ${transaction.To.name}`
+                ? `${transaction.Player.name} was dropped from ${transaction?.From?.name}`
+                : `${transaction.Player.name} was signed to ${transaction?.To?.name}`
+
+            if (transaction.playerTypeAfter === PlayerType.INACTIVE) {
+              text = `${transaction.Player.name} was set to inactive`
+            }
             return (
               <motion.li
                 key={transaction.id}

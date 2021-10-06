@@ -1,4 +1,5 @@
 import { ResolverArgs, UserInputError } from '@redwoodjs/graphql-server'
+import { PlayerType } from '@prisma/client'
 
 import { db } from 'src/lib/db'
 
@@ -42,12 +43,71 @@ export const createPlayer = async ({ input }) => {
   })
 }
 
-export const setPlayerActivity = ({ playerId, active, isPermFreeAgent }) => {
+export const setPlayerActivity = async ({
+  playerId,
+  active,
+  isPermFreeAgent,
+}) => {
+  const player = await db.player.findUnique({ where: { id: playerId } })
+
+  if (active && player.type !== PlayerType.INACTIVE) {
+    throw new UserInputError('User is already active')
+  }
+
+  if (!active && player.type === PlayerType.INACTIVE) {
+    throw new UserInputError('User is already inactive')
+  }
+
   const type = active
     ? isPermFreeAgent
-      ? 'PERM_FREE_AGENT'
-      : 'FREE_AGENT'
-    : 'INACTIVE'
+      ? PlayerType.PERM_FREE_AGENT
+      : PlayerType.FREE_AGENT
+    : PlayerType.INACTIVE
+
+  // Create our transaction
+  const transaction = await db.transaction.create({
+    data: {
+      Player: {
+        connect: {
+          id: playerId,
+        },
+      },
+      fromTeamApproved: true,
+      toTeamApproved: true,
+      pending: false,
+      playerTypeBefore: player.type,
+      playerTypeAfter: type,
+    },
+  })
+
+  // Do some extra stuff when setting a player to inactive
+  if (player.teamId && !active) {
+    // If the player has a team connected we want to mark the transaction as the player is coming from a team
+    await db.transaction.update({
+      where: { id: transaction.id },
+      data: {
+        From: {
+          connect: {
+            id: player.teamId,
+          },
+        },
+      },
+    })
+    // We also want to disconnect that player from the team as they won't be on it anymore
+    await db.team.update({
+      where: {
+        id: player.teamId,
+      },
+      data: {
+        Players: {
+          disconnect: {
+            id: player.id,
+          },
+        },
+      },
+    })
+  }
+
   return db.player.update({
     where: {
       id: playerId,

@@ -18,6 +18,6 @@ export const schema = gql`
   }
 
   type Mutation {
-    createSeason(number: Int!): Season!
+    createSeason(number: Int!): Season! @requireAuth(roles: "admin")
   }
 `

@@ -4,6 +4,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import { useMutation } from '@redwoodjs/web'
 import { Form, Label, TextField, FieldError, Submit } from '@redwoodjs/forms'
+import { useAuth } from '@redwoodjs/auth'
 
 const CREATE_PLAYER = gql`
   mutation CreatePlayer($input: CreatePlayerInput!) {
@@ -16,6 +17,7 @@ const CREATE_PLAYER = gql`
 
 export default function CreatePlayerModal() {
   const [open, setOpen] = useState(true)
+  const { reauthenticate } = useAuth()
   const [createPlayer, { loading, error }] = useMutation(CREATE_PLAYER)
 
   const cancelButtonRef = useRef(null)
@@ -30,6 +32,7 @@ export default function CreatePlayerModal() {
     })
 
     if (!resp.errors) {
+      await reauthenticate()
       setOpen(false)
     }
   }

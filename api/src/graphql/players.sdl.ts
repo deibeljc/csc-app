@@ -6,6 +6,7 @@ export const schema = gql`
     steamId: String!
     discordId: String!
     tier: Tier!
+    conference: Conference!
     Team: Team
     teamId: String
     freeAgent: Boolean!
@@ -28,6 +29,11 @@ export const schema = gql`
     MAJOR
     ELITE
     UNASSIGNED
+  }
+
+  enum Conference {
+    LEFT_TWIX
+    RIGHT_TWIX
   }
 
   type Query {

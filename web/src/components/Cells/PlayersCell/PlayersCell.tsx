@@ -1,6 +1,7 @@
 import type { PlayersQuery } from 'types/graphql'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import { PlayerType } from '@prisma/client'
+import { Link, routes } from '@redwoodjs/router'
 
 export const QUERY = gql`
   query PlayersQuery {
@@ -88,7 +89,12 @@ export const Success = ({ players }: CellSuccessProps<PlayersQuery>) => {
                         {player.name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {player.Team?.name}
+                        <Link
+                          className="text-blue-400"
+                          to={routes.team({ name: player.Team?.name })}
+                        >
+                          {player.Team?.name}
+                        </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {player.tier}

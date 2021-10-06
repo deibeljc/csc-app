@@ -15,6 +15,11 @@ enum Tier {
   UNASSIGNED
 }
 
+enum Conference {
+  LEFT_TWIX
+  RIGHT_TWIX
+}
+
 enum PlayerType {
   FREE_AGENT
   PERM_FREE_AGENT
@@ -65,6 +70,7 @@ model Team {
   name              String        @unique
   acronym           String
   tier              Tier          @default(UNASSIGNED)
+  conference        Conference    @default(LEFT_TWIX)
   Players           Player[]
   MatchesWon        Match[]       @relation(name: "winner")
   MatchesLost       Match[]       @relation(name: "loser")
